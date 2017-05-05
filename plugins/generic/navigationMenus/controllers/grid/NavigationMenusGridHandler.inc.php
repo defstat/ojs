@@ -165,7 +165,7 @@ class NavigationMenusGridHandler extends GridHandler {
 	 * @return string Serialized JSON object
 	 */
 	function updateNavigationMenu($args, $request) {
-		$navigationMenuId = $request->getUserVar('navigationMenusId');
+		$navigationMenuId = $request->getUserVar('navigationMenuId');
 		$context = $request->getContext();
 		$this->setupTemplate($request);
 
