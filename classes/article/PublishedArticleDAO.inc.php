@@ -130,7 +130,7 @@ class PublishedArticleDAO extends ArticleDAO {
 	 */
 	function getPublishedArticleCountByJournalId($journalId) {
 		$result = $this->retrieve(
-			'SELECT count(*) FROM published_submissions ps, submissions s WHERE ps.submission_id = s.submission_id AND s.context_id = ? AND s.status <> ' . STATUS_DECLINED,
+			'SELECT count(*) FROM published_submissions ps, submissions s WHERE ps.submission_id = s.submission_id AND is_current_submission_version = 1 AND s.context_id = ? AND s.status <> ' . STATUS_DECLINED,
 			(int) $journalId
 		);
 		list($count) = $result->fields;
@@ -156,7 +156,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				LEFT JOIN submissions s ON ps.submission_id = s.submission_id
 				LEFT JOIN issues i ON ps.issue_id = i.issue_id
 				' . $this->getFetchJoins() . '
-			WHERE 	i.published = 1
+			WHERE 	i.published = 1 AND ps.is_current_submission_version = 1
 				' . ($journalId?'AND s.context_id = ?':'') . '
 				AND s.status <> ' . STATUS_DECLINED . '
 			ORDER BY ps.date_published '. ($reverse?'DESC':'ASC'),
@@ -194,7 +194,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				JOIN submissions s ON (ps.submission_id = s.submission_id)
 				' . $this->getFetchJoins() . '
 				LEFT JOIN custom_section_orders o ON (s.section_id = o.section_id AND ps.issue_id = o.issue_id)
-			WHERE	ps.issue_id = ?
+			WHERE	ps.issue_id = ? AND ps.is_current_submission_version = 1
 				AND s.status <> ' . STATUS_DECLINED . '
 			ORDER BY section_seq ASC, ps.seq ASC',
 			array_merge(
@@ -245,6 +245,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				' . $this->getFetchJoins() . '
 			WHERE	se.section_id = ?
 				AND ps.issue_id = ?
+				AND ps.is_current_submission_version = 1
 				AND s.status <> ' . STATUS_DECLINED . '
 			ORDER BY ps.seq ASC',
 			array_merge(
@@ -271,9 +272,16 @@ class PublishedArticleDAO extends ArticleDAO {
 	 * @param $publishedArticleId int
 	 * @return PublishedArticle object
 	 */
-	function getPublishedArticleById($publishedArticleId) {
+	function getPublishedArticleById($publishedArticleId, $submissionVersion = null) {
+		$params = array (
+			(int) $publishedArticleId
+		);
+		if ($submissionVersion) $params[] = (int) $submissionVersion;
+
 		$result = $this->retrieve(
-			'SELECT * FROM published_submissions WHERE published_submission_id = ?', (int) $publishedArticleId
+			'SELECT * FROM published_submissions WHERE published_submission_id = ? ' .
+			($submissionVersion) ? ' AND submission_version = ?' : ' AND is_current_submission_version = 1'
+			, $params
 		);
 		$row = $result->GetRowAssoc(false);
 
@@ -284,6 +292,9 @@ class PublishedArticleDAO extends ArticleDAO {
 		$publishedArticle->setDatePublished($this->datetimeFromDB($row['date_published']));
 		$publishedArticle->setSequence($row['seq']);
 		$publishedArticle->setAccessStatus($row['access_status']);
+		$publishedArticle->setSubmissionVersion($row['published_submission_version']);
+		$publishedArticle->setCurrentSubmissionVersion($row['published_submission_version']);
+		$publishedArticle->setIsCurrentSubmissionVersion($row['is_current_submission_version']);
 
 		$result->Close();
 		return $publishedArticle;
@@ -296,7 +307,8 @@ class PublishedArticleDAO extends ArticleDAO {
 	 * @param $useCache boolean optional
 	 * @return PublishedArticle object
 	 */
-	function getByArticleId($articleId, $journalId = null, $useCache = false) {
+	function getByArticleId($articleId, $journalId = null, $useCache = false, $submissionVersion = null) {
+
 		if ($useCache) {
 			$cache = $this->_getPublishedArticleCache();
 			$returner = $cache->get($articleId);
@@ -307,6 +319,7 @@ class PublishedArticleDAO extends ArticleDAO {
 		$params = $this->getFetchParameters();
 		$params[] = (int) $articleId;
 		if ($journalId) $params[] = (int) $journalId;
+		if ($submissionVersion) $params[] = (int) $submissionVersion;
 
 		$result = $this->retrieve(
 			'SELECT	ps.*,
@@ -316,13 +329,14 @@ class PublishedArticleDAO extends ArticleDAO {
 				JOIN submissions s ON (ps.submission_id = s.submission_id)
 				' . $this->getFetchJoins() . '
 			WHERE	s.submission_id = ?' .
-				($journalId?' AND s.context_id = ?':''),
+				($journalId?' AND s.context_id = ?':'') .
+				($submissionVersion?' AND ps.published_submission_version = ?' : ' AND ps.is_current_submission_version = 1'),
 			$params
 		);
 
 		$publishedArticle = null;
 		if ($result->RecordCount() != 0) {
-			$publishedArticle = $this->_fromRow($result->GetRowAssoc(false));
+			$publishedArticle = $this->_fromRow($result->GetRowAssoc(false), true, $submissionVersion);
 		}
 
 		$result->Close();
@@ -378,7 +392,7 @@ class PublishedArticleDAO extends ArticleDAO {
 		} else {
 			$params[] = (string) $settingValue;
 			$sql .= 'INNER JOIN submission_settings sst ON s.submission_id = sst.submission_id
-				WHERE	sst.setting_name = ? AND sst.setting_value = ?';
+				WHERE	sst.setting_name = ? AND sst.setting_value = ? AND ps.is_current_submission_version = 1';
 		}
 		if ($journalId) {
 			$params[] = (int) $journalId;
@@ -435,7 +449,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				JOIN sections se ON se.section_id = s.section_id
 				LEFT JOIN submission_settings stl ON (s.submission_id = stl.submission_id AND stl.setting_name = ? AND stl.locale = ?)
 				LEFT JOIN submission_settings stpl ON (s.submission_id = stpl.submission_id AND stpl.setting_name = ? AND stpl.locale = s.locale)
-			WHERE	i.published = 1' .
+			WHERE	i.published = 1 AND ps.is_current_submission_version = 1' .
 				($journalId?' AND j.journal_id = ?':' AND j.enabled = 1') . '
 			ORDER BY submission_title',
 			$params
@@ -469,7 +483,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				JOIN submissions s ON ps.submission_id = s.submission_id
 				JOIN sections se ON s.section_id = se.section_id
 				JOIN issues i ON ps.issue_id = i.issue_id
-			WHERE	i.published = 1
+			WHERE	i.published = 1 AND ps.is_current_submission_version = 1
 				' . (isset($journalId)?' AND s.context_id = ?':'') . '
 			ORDER BY ps.date_published DESC',
 			isset($journalId)?(int) $journalId:false
@@ -499,7 +513,7 @@ class PublishedArticleDAO extends ArticleDAO {
 			FROM published_submissions ps
 				JOIN submissions s ON s.submission_id = ps.submission_id
 				JOIN issues i ON ps.issue_id = i.issue_id
-			WHERE	i.published = 1 AND
+			WHERE	i.published = 1 AND ps.is_current_submission_version = 1 AND
 				s.section_id = ?
 			ORDER BY ps.date_published DESC',
 			(int) $sectionId
@@ -530,14 +544,19 @@ class PublishedArticleDAO extends ArticleDAO {
 	 * @param $callHooks boolean Whether or not to call hooks
 	 * @return PublishedArticle object
 	 */
-	function _fromRow($row, $callHooks = true) {
+	function _fromRow($row, $callHooks = true, $submissionVersion = null) {
 		$publishedArticle = parent::_fromRow($row);
 		$publishedArticle->setPublishedArticleId($row['published_submission_id']);
 		$publishedArticle->setIssueId($row['issue_id']);
 		$publishedArticle->setSequence($row['seq']);
 		$publishedArticle->setAccessStatus($row['access_status']);
+		$publishedArticle->setDatePublished($row['date_published']);
+		$publishedArticle->setSubmissionVersion($row['published_submission_version']);
+		$publishedArticle->setCurrentSubmissionVersion($row['published_submission_version']);
+		$publishedArticle->setIsCurrentSubmissionVersion($row['is_current_submission_version']);
 
-		$publishedArticle->setGalleys($this->galleyDao->getBySubmissionId($row['submission_id'])->toArray());
+		$publishedArticle->setGalleys($this->galleyDao->getBySubmissionId($row['submission_id'], null, $publishedArticle->getSubmissionVersion())->toArray());
+		$this->getDataObjectSettings('submission_settings', 'submission_id', $publishedArticle->getId(), $publishedArticle, $publishedArticle->getSubmissionVersion());
 
 		if ($callHooks) HookRegistry::call('PublishedArticleDAO::_returnPublishedArticleFromRow', array(&$publishedArticle, &$row));
 		return $publishedArticle;
@@ -552,15 +571,17 @@ class PublishedArticleDAO extends ArticleDAO {
 	function insertObject($publishedArticle) {
 		$this->update(
 			sprintf('INSERT INTO published_submissions
-				(submission_id, issue_id, date_published, seq, access_status)
+				(submission_id, issue_id, date_published, seq, access_status, published_submission_version, is_current_submission_version)
 				VALUES
-				(?, ?, %s, ?, ?)',
+				(?, ?, %s, ?, ?, ?, ?)',
 				$this->datetimeToDB($publishedArticle->getDatePublished())),
 			array(
 				(int) $publishedArticle->getId(),
 				(int) $publishedArticle->getIssueId(),
 				$publishedArticle->getSequence(),
-				$publishedArticle->getAccessStatus()
+				$publishedArticle->getAccessStatus(),
+				(int) $publishedArticle->getSubmissionVersion(),
+				(int) $publishedArticle->getIsCurrentSubmissionVersion(),
 			)
 		);
 
@@ -609,14 +630,14 @@ class PublishedArticleDAO extends ArticleDAO {
 			'SELECT	ps.submission_id AS submission_id
 			FROM	published_submissions ps
 				JOIN submissions s ON ps.submission_id = s.submission_id
-			WHERE	s.section_id = ?',
+			WHERE	s.section_id = ? AND ps.is_current_submission_version = 1 ',
 			(int) $sectionId
 		);
 
 		while (!$result->EOF) {
 			$row = $result->GetRowAssoc(false);
 			$this->update(
-				'DELETE FROM published_submissions WHERE submission_id = ?', $row['submission_id']
+				'DELETE FROM published_submissions WHERE submission_id = ? AND is_current_submission_version = 1', $row['submission_id']
 			);
 		}
 
@@ -648,15 +669,18 @@ class PublishedArticleDAO extends ArticleDAO {
 					issue_id = ?,
 					date_published = %s,
 					seq = ?,
-					access_status = ?
-				WHERE published_submission_id = ?',
+					access_status = ?,
+					is_current_submission_version = ?
+				WHERE published_submission_id = ? AND published_submission_version = ?',
 				$this->datetimeToDB($publishedArticle->getDatePublished())),
 			array(
 				(int) $publishedArticle->getId(),
 				(int) $publishedArticle->getIssueId(),
 				$publishedArticle->getSequence(),
 				$publishedArticle->getAccessStatus(),
-				(int) $publishedArticle->getPublishedArticleId()
+				(int) $publishedArticle->getIsCurrentSubmissionVersion(),
+				(int) $publishedArticle->getPublishedArticleId(),
+				(int) $publishedArticle->getSubmissionVersion()
 			)
 		);
 
@@ -671,7 +695,7 @@ class PublishedArticleDAO extends ArticleDAO {
 	 */
 	function updatePublishedArticleField($publishedArticleId, $field, $value) {
 		$this->update(
-			"UPDATE published_submissions SET $field = ? WHERE published_submission_id = ?", array($value, (int) $publishedArticleId)
+			"UPDATE published_submissions SET $field = ? WHERE published_submission_id = ? AND is_current_submission_version = 1", array($value, (int) $publishedArticleId)
 		);
 
 		$this->flushCache();
@@ -684,14 +708,14 @@ class PublishedArticleDAO extends ArticleDAO {
 	 */
 	function resequencePublishedArticles($sectionId, $issueId) {
 		$result = $this->retrieve(
-			'SELECT ps.published_submission_id FROM published_submissions ps, submissions s WHERE s.section_id = ? AND s.submission_id = ps.submission_id AND ps.issue_id = ? ORDER BY ps.seq',
+			'SELECT ps.published_submission_id FROM published_submissions ps, submissions s WHERE s.section_id = ? AND s.submission_id = ps.submission_id AND ps.issue_id = ? AND ps.is_current_submission_version = 1 ORDER BY ps.seq',
 			array((int) $sectionId, (int) $issueId)
 		);
 
 		for ($i=1; !$result->EOF; $i++) {
 			list($publishedArticleId) = $result->fields;
 			$this->update(
-				'UPDATE published_submissions SET seq = ? WHERE published_submission_id = ?',
+				'UPDATE published_submissions SET seq = ? WHERE published_submission_id = ? AND is_current_submission_version = 1',
 				array($i, $publishedArticleId)
 			);
 
@@ -712,7 +736,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				MIN(ps.date_published)
 			FROM	published_submissions ps,
 				submissions s
-			WHERE	ps.submission_id = s.submission_id
+			WHERE	ps.submission_id = s.submission_id AND is_current_submission_version = 1
 				' . (isset($journalId)?' AND s.context_id = ?':''),
 			isset($journalId)?(int) $journalId:false
 		);
@@ -774,7 +798,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				. ($pubIdSettingName != null?' LEFT JOIN submission_settings sss ON (s.submission_id = sss.submission_id AND sss.setting_name = ?)':'')
 				. ' ' . $this->getFetchJoins() .'
 			WHERE
-				i.published = 1 AND s.context_id = ? AND s.status <> ' . STATUS_DECLINED
+				i.published = 1 AND is_current_submission_version = 1 AND s.context_id = ? AND s.status <> ' . STATUS_DECLINED
 				. ($pubIdType != null?' AND ss.setting_name = ? AND ss.setting_value IS NOT NULL':'')
 				. ($title != null?' AND (sst.setting_name = ? AND sst.setting_value LIKE ?)':'')
 				. ($author != null?' AND (asgs.setting_value LIKE ? OR asfs.setting_value LIKE ?)':'')

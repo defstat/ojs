@@ -187,7 +187,7 @@ class ArticleGalleyGridHandler extends GridHandler {
 	 */
 	function loadData($request, $filter = null) {
 		$galleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
-		return $galleyDao->getBySubmissionId($this->getSubmission()->getId());
+		return $galleyDao->getBySubmissionId($this->getSubmission()->getId(), null, $this->getSubmission()->getSubmissionVersion());
 	}
 
 	//
