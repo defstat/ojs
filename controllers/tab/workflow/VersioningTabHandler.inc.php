@@ -72,14 +72,26 @@ class VersioningTabHandler extends PKPVersioningTabHandler {
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$stageId = $this->getAuthorizedContextObject(ASSOC_TYPE_WORKFLOW_STAGE);
 
+		$publishedSubmissionDao = Application::getPublishedSubmissionDAO(); /** @var $publishedSubmissionDao PublishedArticleDAO */
+
 		// Create schedule for publication link action.
 		$dispatcher = $request->getDispatcher();
 		import('lib.pkp.classes.linkAction.request.AjaxModal');
 
-		if ($submission->getSubmissionVersion() == 1){
-			$linkActionLabel = 'editor.article.schedulePublication';
+		if ($submission->getSubmissionVersion() != $submission->getCurrentSubmissionVersion()) {
+			$linkActionPublicationLabel = 'editor.article.showPublicationVersion';
 		} else {
-			$linkActionLabel = 'editor.article.publishVersion';
+			if ($submission->getSubmissionVersion() == $publishedSubmissionDao->getCurrentPublishedSubmissionVersion($submission->getId())){
+				$linkActionPublicationLabel = 'editor.article.schedulePublication';
+			} else {
+				$linkActionPublicationLabel = 'editor.article.publishVersion';
+			}
+		}
+
+		if ($submission->getSubmissionVersion() != $submission->getCurrentSubmissionVersion()) {
+			$linkActionMetadataLabel = 'editor.article.viewMetadata';
+		} else {
+			$linkActionMetadataLabel = 'editor.article.editMetadata';
 		}
 
 		$schedulePublicationLinkAction = new LinkAction(
@@ -91,9 +103,9 @@ class VersioningTabHandler extends PKPVersioningTabHandler {
 					'publicationMetadata', null,
 					array('submissionId' => $submission->getId(), 'stageId' => $stageId, 'submissionVersion' => $submission->getSubmissionVersion())
 				),
-				__('submission.issueEntry.publicationMetadata')
+				__($linkActionPublicationLabel)
 			),
-			__($linkActionLabel)
+			__($linkActionPublicationLabel)
 		);
 
 		$templateMgr->assign('schedulePublicationLinkAction', $schedulePublicationLinkAction);
@@ -117,9 +129,9 @@ class VersioningTabHandler extends PKPVersioningTabHandler {
 		      'fetch', null,
 		      array('submissionId' => $submission->getId(), 'stageId' => $stageId, 'submissionVersion' => $submission->getSubmissionVersion())
 		    ),
-		    __('editor.article.editMetadata')
+		    __($linkActionMetadataLabel)
 		  ),
-		  __('editor.article.editMetadata')
+		  __($linkActionMetadataLabel)
 		);
 		$templateMgr->assign('editVersionMetadataLinkAction', $editVersionMetadataLinkAction);
 
