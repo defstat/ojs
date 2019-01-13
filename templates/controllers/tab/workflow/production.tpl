@@ -7,7 +7,6 @@
  *
  * Production workflow stage
  *}
-{debug}
 <script type="text/javascript">
 	// Attach the JS file tab handler.
 	$(function() {ldelim}
@@ -20,7 +19,7 @@
 		);
 	{rdelim});
 </script>
-{debug}
+
 {* Help tab *}
 {help file="editorial-workflow/production.md" class="pkp_help_tab"}
 
