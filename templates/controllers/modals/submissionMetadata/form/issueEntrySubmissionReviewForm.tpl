@@ -45,6 +45,7 @@
 
 	<input type="hidden" name="submissionId" value="{$submissionId|escape}" />
 	<input type="hidden" name="stageId" value="{$stageId|escape}" />
+	<input type="hidden" name="submissionVersion" value="{$submissionVersion|escape}" />
 	<input type="hidden" name="displayedInContainer" value="{$formParams.displayedInContainer|escape}" />
 	<input type="hidden" name="tab" value="submission" />
 
@@ -58,7 +59,7 @@
 	{if !$formParams.hideSubmit || !$formParams.anonymous}
 		{* generate a unique ID for the form *}
 		{assign var="authorsGridContainer" value="authorsGridContainer-"|uniqid|escape}
-		{capture assign=authorGridUrl}{url router=$smarty.const.ROUTE_COMPONENT  component="grid.users.author.AuthorGridHandler" op="fetchGrid" submissionId=$submissionId stageId=$stageId escape=false}{/capture}
+		{capture assign=authorGridUrl}{url router=$smarty.const.ROUTE_COMPONENT  component="grid.users.author.AuthorGridHandler" op="fetchGrid" submissionId=$submissionId stageId=$stageId submissionVersion=$submissionVersion escape=false}{/capture}
 		{load_url_in_div id=$authorsGridContainer url="$authorGridUrl"}
 	{/if}
 

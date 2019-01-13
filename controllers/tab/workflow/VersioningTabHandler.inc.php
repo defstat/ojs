@@ -108,20 +108,20 @@ class VersioningTabHandler extends PKPVersioningTabHandler {
 			new SubmissionEntryLinkAction($request, $submission->getId(), $stageId, null, 'information', $submission->getSubmissionVersion())
 		);
 
-		//$editMetadataLinkAction = new LinkAction(
-		//  'editMetadata',
-		//  new AjaxModal(
-		//    $dispatcher->url(
-		//      $request, ROUTE_COMPONENT, null,
-		//      'modals.submissionMetadata.IssueEntryHandler',
-		//      'fetch', null,
-		//      array('submissionId' => $submission->getId(), 'stageId' => $stageId, 'submissionVersion' => $submissionVersion)
-		//    ),
-		//    __('editor.article.editMetadata')
-		//  ),
-		//  __('editor.article.editMetadata')
-		//);
-		//$templateMgr->assign('editMetadataLinkAction', $editMetadataLinkAction);
+		$editVersionMetadataLinkAction = new LinkAction(
+		  'editMetadata',
+		  new AjaxModal(
+		    $dispatcher->url(
+		      $request, ROUTE_COMPONENT, null,
+		      'modals.submissionMetadata.IssueEntryHandler',
+		      'fetch', null,
+		      array('submissionId' => $submission->getId(), 'stageId' => $stageId, 'submissionVersion' => $submission->getSubmissionVersion())
+		    ),
+		    __('editor.article.editMetadata')
+		  ),
+		  __('editor.article.editMetadata')
+		);
+		$templateMgr->assign('editVersionMetadataLinkAction', $editVersionMetadataLinkAction);
 
 		return parent::versioning($args, $request);
 	}

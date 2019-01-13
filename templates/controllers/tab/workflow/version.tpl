@@ -22,7 +22,7 @@
 		{/if}
 		<div id="editMetadataDiv" class="pkp_tab_actions">
 			<ul class="pkp_workflow_decisions">
-				<li>{include file="linkAction/linkAction.tpl" action=$editMetadataLinkAction}</li>
+				<li>{include file="linkAction/linkAction.tpl" action=$editVersionMetadataLinkAction}</li>
 			</ul>
 		</div>
 
