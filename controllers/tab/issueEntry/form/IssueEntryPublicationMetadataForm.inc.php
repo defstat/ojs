@@ -68,6 +68,7 @@ class IssueEntryPublicationMetadataForm extends Form {
 		$templateMgr->assign(array(
 			'submissionId' => $this->getSubmission()->getId(),
 			'stageId' => $this->getStageId(),
+			'submissionVersion' => $this->getSubmission()->getSubmissionVersion(),
 			'formParams' => $this->getFormParams(),
 			'context' => $context,
 		));
@@ -147,7 +148,7 @@ class IssueEntryPublicationMetadataForm extends Form {
 
 		$submission = $this->getSubmission();
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-		$this->_publishedArticle = $publishedArticleDao->getByArticleId($submission->getId(), null, false);
+		$this->_publishedArticle = $publishedArticleDao->getByArticleId($submission->getId(), null, false, $submission->getSubmissionVersion());
 
 		$copyrightHolder = $submission->getCopyrightHolder(null);
 		$copyrightYear = $submission->getCopyrightYear();
