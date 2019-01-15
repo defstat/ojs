@@ -74,8 +74,8 @@ class ArticleDAO extends SubmissionDAO {
 	 * @param $row array
 	 * @return Article
 	 */
-	function _fromRow($row) {
-		$article = parent::_fromRow($row);
+	function _fromRow($row, $submissionVersion = null) {
+		$article = parent::_fromRow($row, $submissionVersion);
 
 		$article->setSectionId($row['section_id']);
 		$article->setSectionTitle($row['section_title']);
@@ -85,6 +85,7 @@ class ArticleDAO extends SubmissionDAO {
 		$article->setHideAuthor($row['hide_author']);
 
 		HookRegistry::call('ArticleDAO::_fromRow', array(&$article, &$row));
+
 		return $article;
 	}
 
@@ -104,9 +105,9 @@ class ArticleDAO extends SubmissionDAO {
 		$article->stampModified();
 		$this->update(
 			sprintf('INSERT INTO submissions
-				(locale, context_id, section_id, stage_id, language, citations, date_submitted, date_status_modified, last_modified, status, submission_progress, pages, hide_author)
+				(locale, context_id, section_id, stage_id, language, citations, date_submitted, date_status_modified, last_modified, status, submission_progress, pages, hide_author, submission_version)
 				VALUES
-				(?, ?, ?, ?, ?, ?, %s, %s, %s, ?, ?, ?, ?)',
+				(?, ?, ?, ?, ?, ?, %s, %s, %s, ?, ?, ?, ?, ?)',
 				$this->datetimeToDB($article->getDateSubmitted()), $this->datetimeToDB($article->getDateStatusModified()), $this->datetimeToDB($article->getLastModified())),
 			array(
 				$article->getLocale(),
@@ -119,6 +120,7 @@ class ArticleDAO extends SubmissionDAO {
 				$article->getSubmissionProgress() === null ? 1 : $article->getSubmissionProgress(),
 				$article->getPages(),
 				(int) $article->getHideAuthor(),
+				(int) $article->getCurrentSubmissionVersion(),
 			)
 		);
 
@@ -154,7 +156,8 @@ class ArticleDAO extends SubmissionDAO {
 					status = ?,
 					submission_progress = ?,
 					pages = ?,
-					hide_author = ?
+					hide_author = ?,
+					submission_version = ?
 				WHERE submission_id = ?',
 				$this->datetimeToDB($article->getDateSubmitted()), $this->datetimeToDB($article->getDateStatusModified()), $this->datetimeToDB($article->getLastModified())),
 			array(
@@ -167,6 +170,7 @@ class ArticleDAO extends SubmissionDAO {
 				(int) $article->getSubmissionProgress(),
 				$article->getPages(),
 				(int) $article->getHideAuthor(),
+				(int) $article->getSubmissionVersion(),
 				(int) $article->getId()
 			)
 		);
@@ -385,6 +389,17 @@ class ArticleDAO extends SubmissionDAO {
 	 */
 	protected function getCompletionConditions($completed) {
 		return ' i.date_published IS ' . ($completed?'NOT ':'') . 'NULL ';
+	}
+
+	function newVersion($submissionId) {
+		parent::newVersion($submissionId);
+	}
+
+	function versioningRelatedEntityDaos() {
+		return array_merge(
+			parent::versioningRelatedEntityDaos(),
+			array('ArticleGalleyDAO')
+		);
 	}
 }
 

@@ -176,6 +176,14 @@ class Application extends PKPApplication {
 	}
 
 	/**
+	 * Get the PublishedSubmision DAO.
+	 * @return SubmissionDAO
+	 */
+	static function getPublishedSubmissionDAO() {
+		return DAORegistry::getDAO('PublishedArticleDAO');
+	}
+
+	/**
 	 * Returns the name of the context column in plugin_settings
 	 * @return string
 	 */
