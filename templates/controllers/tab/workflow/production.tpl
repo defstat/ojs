@@ -13,8 +13,8 @@
 		$('#submissionVersions').pkpHandler(
 			'$.pkp.controllers.TabHandler',
 			{ldelim}
-				{assign var=selectedTabIndex value=$currentSubmissionVersion}
-				selected: 1
+				{assign var=selectedTabIndex value=$currentSubmissionVersion - 1}
+				selected: {$selectedTabIndex}
 			{rdelim}
 		);
 	{rdelim});
