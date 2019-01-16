@@ -130,7 +130,14 @@ class PublishedArticleDAO extends ArticleDAO {
 	 */
 	function getPublishedArticleCountByJournalId($journalId) {
 		$result = $this->retrieve(
-			'SELECT count(*) FROM published_submissions ps, submissions s WHERE ps.submission_id = s.submission_id AND is_current_submission_version = 1 AND s.context_id = ? AND s.status <> ' . STATUS_DECLINED,
+			'SELECT count(*)
+			FROM published_submissions ps,
+			submissions s
+			WHERE
+			ps.submission_id = s.submission_id
+			AND is_current_submission_version = 1
+			AND s.context_id = ?
+			AND s.status <> ' . STATUS_DECLINED,
 			(int) $journalId
 		);
 		list($count) = $result->fields;
@@ -272,16 +279,14 @@ class PublishedArticleDAO extends ArticleDAO {
 	 * @param $publishedArticleId int
 	 * @return PublishedArticle object
 	 */
-	function getPublishedArticleById($publishedArticleId, $submissionVersion = null) {
+	function getPublishedArticleById($publishedArticleId) {
 		$params = array (
 			(int) $publishedArticleId
 		);
-		if ($submissionVersion) $params[] = (int) $submissionVersion;
 
 		$result = $this->retrieve(
-			'SELECT * FROM published_submissions WHERE published_submission_id = ? ' .
-			($submissionVersion) ? ' AND submission_version = ?' : ' AND is_current_submission_version = 1'
-			, $params
+			'SELECT * FROM published_submissions WHERE published_submission_id = ? ',
+			$params
 		);
 		$row = $result->GetRowAssoc(false);
 
@@ -307,7 +312,7 @@ class PublishedArticleDAO extends ArticleDAO {
 	 * @param $useCache boolean optional
 	 * @return PublishedArticle object
 	 */
-	function getByArticleId($articleId, $journalId = null, $useCache = false, $submissionVersion = null) {
+	function getBySubmissionId($articleId, $journalId = null, $useCache = false, $submissionVersion = null) {
 
 		if ($useCache) {
 			$cache = $this->_getPublishedArticleCache();
@@ -413,7 +418,7 @@ class PublishedArticleDAO extends ArticleDAO {
 	function getPublishedArticleByBestArticleId($journalId, $articleId, $useCache = false) {
 		$article = $this->getPublishedArticleByPubId('publisher-id', $articleId, $journalId, $useCache);
 		if (!$article && ctype_digit("$articleId")) {
-			return $this->getByArticleId($articleId, $journalId, $useCache);
+			return $this->getBySubmissionId($articleId, $journalId, $useCache);
 		}
 		return $article;
 	}

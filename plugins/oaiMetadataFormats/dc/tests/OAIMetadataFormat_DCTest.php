@@ -183,9 +183,9 @@ class OAIMetadataFormat_DCTest extends PKPTestCase {
 
 		// Create a mocked PublishedArticleDAO that returns our test article.
 		import('classes.article.PublishedArticleDAO');
-		$articleDao = $this->getMock('PublishedArticleDAO', array('getByArticleId'));
+		$articleDao = $this->getMock('PublishedArticleDAO', array('getBySubmissionId'));
 		$articleDao->expects($this->any())
-		            ->method('getByArticleId')
+		            ->method('getBySubmissionId')
 		            ->will($this->returnValue($article));
 		DAORegistry::registerDAO('PublishedArticleDAO', $articleDao);
 

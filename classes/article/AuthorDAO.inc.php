@@ -104,7 +104,7 @@ class AuthorDAO extends PKPAuthorDAO {
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
 		while (!$result->EOF) {
 			$row = $result->getRowAssoc(false);
-			$publishedArticle = $publishedArticleDao->getByArticleId($row['submission_id']);
+			$publishedArticle = $publishedArticleDao->getBySubmissionId($row['submission_id']);
 			if ($publishedArticle) {
 				$publishedArticles[] = $publishedArticle;
 			}

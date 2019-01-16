@@ -148,7 +148,7 @@ class IssueEntryPublicationMetadataForm extends Form {
 
 		$submission = $this->getSubmission();
 		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-		$this->_publishedArticle = $publishedArticleDao->getByArticleId($submission->getId(), null, false, $submission->getSubmissionVersion());
+		$this->_publishedArticle = $publishedArticleDao->getBySubmissionId($submission->getId(), null, false, $submission->getSubmissionVersion());
 
 		$copyrightHolder = $submission->getCopyrightHolder(null);
 		$copyrightYear = $submission->getCopyrightYear();
@@ -256,7 +256,7 @@ class IssueEntryPublicationMetadataForm extends Form {
 
 			$sectionDao = DAORegistry::getDAO('SectionDAO');
 			$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-			$publishedArticle = $publishedArticleDao->getByArticleId($submission->getId(), null, false, $submission->getSubmissionVersion()); /* @var $publishedArticle PublishedArticle */
+			$publishedArticle = $publishedArticleDao->getBySubmissionId($submission->getId(), null, false, $submission->getSubmissionVersion()); /* @var $publishedArticle PublishedArticle */
 
 			if ($publishedArticle) {
 				if (!$issue || !$issue->getPublished()) {
@@ -303,7 +303,7 @@ class IssueEntryPublicationMetadataForm extends Form {
 					$publishedArticle->setSubmissionVersion($submission->getSubmissionVersion());
 					$publishedArticle->setIsCurrentSubmissionVersion(true);
 
-					$prevPublishedArticle = $publishedArticleDao->getByArticleId($submission->getId(), null, false, $submission->getSubmissionVersion() - 1);
+					$prevPublishedArticle = $publishedArticleDao->getBySubmissionId($submission->getId(), null, false, $submission->getSubmissionVersion() - 1);
 					if ($prevPublishedArticle) {
 						$prevPublishedArticle->setIsCurrentSubmissionVersion(false);
 
