@@ -548,12 +548,11 @@
 		<field name="prev_ver_id" type="I8" />
 		<field name="is_current_submission_version" type="I1">
 			<NOTNULL />
-			<DEFAULT VALUE="0" />
+			<DEFAULT VALUE="1" />
 		</field>
 		<descr>Published submissions</descr>
 		<index name="published_submissions_submission_id">
 			<col>submission_id</col>
-			<UNIQUE/>
 		</index>
 		<index name="published_submissions_issue_id">
 			<col>issue_id</col>
@@ -592,7 +591,7 @@
 		<field name="prev_ver_id" type="I8" />
 		<field name="is_current_submission_version" type="I1">
 			<NOTNULL />
-			<DEFAULT VALUE="0" />
+			<DEFAULT VALUE="1" />
 		</field>
 		<descr>Submission galleys</descr>
 		<index name="submission_galleys_submission_id">
