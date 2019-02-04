@@ -108,7 +108,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				JOIN sections sec ON (s.section_id = sec.section_id)
 				' . $this->getFetchJoins() . '
 				LEFT JOIN custom_section_orders o ON (s.section_id = o.section_id AND o.issue_id = ?)
-			WHERE	ps.issue_id = ?
+			WHERE ps.is_current_submission_version=1 AND ps.issue_id = ?
 				AND s.status <> ' . STATUS_DECLINED . '
 			ORDER BY section_seq ASC, ps.seq ASC';
 
@@ -397,8 +397,9 @@ class PublishedArticleDAO extends ArticleDAO {
 		} else {
 			$params[] = (string) $settingValue;
 			$sql .= 'INNER JOIN submission_settings sst ON s.submission_id = sst.submission_id
-				WHERE	sst.setting_name = ? AND sst.setting_value = ? AND ps.is_current_submission_version = 1';
+				WHERE	sst.setting_name = ? AND sst.setting_value = ? ';
 		}
+		$sql .= ' AND ps.is_current_submission_version = 1';
 		if ($journalId) {
 			$params[] = (int) $journalId;
 			$sql .= ' AND s.context_id = ?';
@@ -799,7 +800,7 @@ class PublishedArticleDAO extends ArticleDAO {
 				. ($pubIdSettingName != null?' LEFT JOIN submission_settings sss ON (s.submission_id = sss.submission_id AND sss.setting_name = ?)':'')
 				. ' ' . $this->getFetchJoins() .'
 			WHERE
-				i.published = 1 AND is_current_submission_version = 1 AND s.context_id = ? AND s.status <> ' . STATUS_DECLINED
+				i.published = 1 AND ps.is_current_submission_version = 1 AND s.context_id = ? AND s.status <> ' . STATUS_DECLINED
 				. ($pubIdType != null?' AND ss.setting_name = ? AND ss.setting_value IS NOT NULL':'')
 				. ($title != null?' AND (sst.setting_name = ? AND sst.setting_value LIKE ?)':'')
 				. ($author != null?' AND (asgs.setting_value LIKE ? OR asfs.setting_value LIKE ?)':'')

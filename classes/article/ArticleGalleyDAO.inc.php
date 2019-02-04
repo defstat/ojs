@@ -98,6 +98,7 @@ class ArticleGalleyDAO extends RepresentationDAO implements PKPPubIdPluginDAO {
 			$sql .= 'INNER JOIN submission_galley_settings gs ON g.galley_id = gs.galley_id
 				WHERE	gs.setting_name = ? AND gs.setting_value = ? AND g.is_current_submission_version = 1';
 		}
+		$sql .= ' AND pa.is_current_submission_version = 1';
 		if ($articleId) {
 			$params[] = (int) $articleId;
 			$sql .= ' AND g.submission_id = ?';
@@ -150,7 +151,7 @@ class ArticleGalleyDAO extends RepresentationDAO implements PKPPubIdPluginDAO {
 				INNER JOIN submissions a ON (g.submission_id = a.submission_id)
 				LEFT JOIN submission_files sf ON (g.file_id = sf.file_id)
 				LEFT JOIN submission_files nsf ON (nsf.file_id = g.file_id AND nsf.revision > sf.revision)
-			WHERE	a.context_id = ? AND g.is_current_submission_version = 1 
+			WHERE	a.context_id = ? AND g.is_current_submission_version = 1
 				AND nsf.file_id IS NULL',
 			(int) $journalId
 		);
@@ -511,7 +512,7 @@ class ArticleGalleyDAO extends RepresentationDAO implements PKPPubIdPluginDAO {
 					':'')
 				. ($pubIdSettingName != null?' LEFT JOIN submission_galley_settings gss ON (g.galley_id = gss.galley_id AND gss.setting_name = ?)':'') .'
 			WHERE
-				i.published = 1 AND s.context_id = ? AND g.is_current_submission_version = 1 
+				i.published = 1 AND s.context_id = ? AND g.is_current_submission_version = 1 AND ps.is_current_submission_version = 1
 				' . ($pubIdType != null?' AND gs.setting_name = ? AND gs.setting_value IS NOT NULL':'')
 				. ($title != null?' AND (sst.setting_name = ? AND sst.setting_value LIKE ?)':'')
 				. ($author != null?' AND (asgs.setting_value LIKE ? OR asfs.setting_value LIKE ?)':'')

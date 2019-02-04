@@ -59,6 +59,7 @@ class ArticleDAO extends SubmissionDAO {
 			$sql .= 'INNER JOIN submission_settings sst ON s.submission_id = sst.submission_id
 				WHERE	sst.setting_name = ? AND sst.setting_value = ?';
 		}
+		$sql .= ' AND ps.is_current_submission_version = 1';
 		if ($journalId) {
 			$params[] = (int) $journalId;
 			$sql .= ' AND s.context_id = ?';
