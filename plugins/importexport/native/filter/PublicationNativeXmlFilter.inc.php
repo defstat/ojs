@@ -37,7 +37,7 @@ class PublicationNativeXmlFilter extends PKPPublicationNativeXmlFilter {
 	 * @return string
 	 */
 	function getRepresentationExportFilterGroupName() {
-		return 'article-galley=>native-xml';
+		return 'preprint-galley=>native-xml';
 	}
 
 	//

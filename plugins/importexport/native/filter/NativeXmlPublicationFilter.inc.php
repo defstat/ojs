@@ -10,7 +10,7 @@
  * @class NativeXmlPublicationFilter
  * @ingroup plugins_importexport_native
  *
- * @brief Class that converts a Native XML document to a set of articles.
+ * @brief Class that converts a Native XML document to a set of publications.
  */
 
 import('lib.pkp.plugins.importexport.native.filter.NativeXmlPKPPublicationFilter');
@@ -27,8 +27,8 @@ class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter {
 	}
 
 	/**
-	 * Handle an Article import.
-	 * The Article must have a valid section in order to be imported
+	 * Handle an Publication import.
+	 * The Publication must have a valid section in order to be imported
 	 * @param $node DOMElement
 	 */
 	function handleElement($node) {
@@ -79,8 +79,8 @@ class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter {
 	 */
 	function handleChildElement($n, $publication) {
 		switch ($n->tagName) {
-			case 'article_galley':
-				$this->parseArticleGalley($n, $publication);
+			case 'preprint_galley':
+				$this->parsePreprintGalley($n, $publication);
 				break;
 			case 'pages':
 				$publication->setData('pages', $n->textContent);
@@ -104,7 +104,7 @@ class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter {
 		$deployment = $this->getDeployment();
 		$submission = $deployment->getSubmission();
 		switch ($elementName) {
-			case 'article_galley':
+			case 'preprint_galley':
 				$importClass='ArticleGalley';
 				break;
 			default:
@@ -120,17 +120,17 @@ class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter {
 	}
 
 	/**
-	 * Parse an article galley and add it to the publication.
+	 * Parse an preprint galley and add it to the publication.
 	 * @param $n DOMElement
 	 * @param $publication Publication
 	 */
-	function parseArticleGalley($n, $publication) {
+	function parsePreprintGalley($n, $publication) {
 		$importFilter = $this->getImportFilter($n->tagName);
 		assert(isset($importFilter)); // There should be a filter
 
 		$importFilter->setDeployment($this->getDeployment());
-		$articleGalleyDoc = new DOMDocument();
-		$articleGalleyDoc->appendChild($articleGalleyDoc->importNode($n, true));
-		return $importFilter->execute($articleGalleyDoc);
+		$preprintGalleyDoc = new DOMDocument();
+		$preprintGalleyDoc->appendChild($preprintGalleyDoc->importNode($n, true));
+		return $importFilter->execute($preprintGalleyDoc);
 	}
 }

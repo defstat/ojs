@@ -131,8 +131,8 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 				}
 				$temporaryFilePath = $temporaryFile->getFilePath();
 
-				$filter = 'native-xml=>article';
-				// is this articles import:
+				$filter = 'native-xml=>preprint';
+				// is this preprints import:
 				$xmlString = file_get_contents($temporaryFilePath);
 
 				$deployment = new NativeImportExportDeployment($context, $user);
@@ -193,7 +193,7 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 				);
 				import('lib.pkp.classes.file.FileManager');
 				$fileManager = new FileManager();
-				$exportFileName = $this->getExportFileName($this->getExportPath(), 'articles', $context, '.xml');
+				$exportFileName = $this->getExportFileName($this->getExportPath(), 'preprints', $context, '.xml');
 				$fileManager->writeFile($exportFileName, $exportXml);
 				$fileManager->downloadByPath($exportFileName);
 				$fileManager->deleteByPath($exportFileName);
@@ -215,7 +215,7 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 	function exportSubmissions($submissionIds, $context, $user, $opts = array()) {
 		$submissionDao = DAORegistry::getDAO('SubmissionDAO'); /* @var $submissionDao SubmissionDAO */
 		$filterDao = DAORegistry::getDAO('FilterDAO'); /* @var $filterDao FilterDAO */
-		$nativeExportFilters = $filterDao->getObjectsByGroup('article=>native-xml');
+		$nativeExportFilters = $filterDao->getObjectsByGroup('preprint=>native-xml');
 		assert(count($nativeExportFilters) == 1); // Assert only a single serialization filter
 		$exportFilter = array_shift($nativeExportFilters);
 		$exportFilter->setDeployment(new NativeImportExportDeployment($context, $user));
@@ -321,8 +321,8 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 					return;
 				}
 
-				$filter = 'native-xml=>article';
-				// is this articles import:
+				$filter = 'native-xml=>preprint';
+				// is this preprints import:
 				$xmlString = file_get_contents($xmlFile);
 				
 				$deployment = new NativeImportExportDeployment($journal, $user);
@@ -389,8 +389,8 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 					return;
 				}
 				if ($xmlFile != '') switch (array_shift($args)) {
-					case 'article':
-					case 'articles':
+					case 'preprint':
+					case 'preprints':
 						file_put_contents($xmlFile, $this->exportSubmissions(
 							$args,
 							$journal,

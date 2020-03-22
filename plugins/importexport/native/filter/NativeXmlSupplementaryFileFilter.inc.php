@@ -13,9 +13,9 @@
  * @brief Class that converts a Native XML document to an supplementary file.
  */
 
-import('plugins.importexport.native.filter.NativeXmlArticleFileFilter');
+import('plugins.importexport.native.filter.NativeXmlPreprintFileFilter');
 
-class NativeXmlSupplementaryFileFilter extends NativeXmlArticleFileFilter {
+class NativeXmlSupplementaryFileFilter extends NativeXmlPreprintFileFilter {
 	/**
 	 * Constructor
 	 * @param $filterGroup FilterGroup
