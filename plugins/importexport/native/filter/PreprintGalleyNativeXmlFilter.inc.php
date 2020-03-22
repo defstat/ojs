@@ -1,21 +1,21 @@
 <?php
 
 /**
- * @file plugins/importexport/native/filter/ArticleGalleyNativeXmlFilter.inc.php
+ * @file plugins/importexport/native/filter/PreprintGalleyNativeXmlFilter.inc.php
  *
  * Copyright (c) 2014-2020 Simon Fraser University
  * Copyright (c) 2000-2020 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ArticleGalleyNativeXmlFilter
+ * @class PreprintGalleyNativeXmlFilter
  * @ingroup plugins_importexport_native
  *
- * @brief Class that converts an ArticleGalley to a Native XML document.
+ * @brief Class that converts an PreprintGalley to a Native XML document.
  */
 
 import('lib.pkp.plugins.importexport.native.filter.RepresentationNativeXmlFilter');
 
-class ArticleGalleyNativeXmlFilter extends RepresentationNativeXmlFilter {
+class PreprintGalleyNativeXmlFilter extends RepresentationNativeXmlFilter {
 	/**
 	 * Constructor
 	 * @param $filterGroup FilterGroup
@@ -32,7 +32,7 @@ class ArticleGalleyNativeXmlFilter extends RepresentationNativeXmlFilter {
 	 * @copydoc PersistableFilter::getClassName()
 	 */
 	function getClassName() {
-		return 'plugins.importexport.native.filter.ArticleGalleyNativeXmlFilter';
+		return 'plugins.importexport.native.filter.PreprintGalleyNativeXmlFilter';
 	}
 
 	//

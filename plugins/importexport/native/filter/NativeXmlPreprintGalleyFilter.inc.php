@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @file plugins/importexport/native/filter/NativeXmlArticleGalleyFilter.inc.php
+ * @file plugins/importexport/native/filter/NativeXmlPreprintGalleyFilter.inc.php
  *
  * Copyright (c) 2014-2020 Simon Fraser University
  * Copyright (c) 2000-2020 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class NativeXmlArticleGalleyFilter
+ * @class NativeXmlPreprintGalleyFilter
  * @ingroup plugins_importexport_native
  *
  * @brief Class that converts a Native XML document to a set of publication formats.
@@ -15,7 +15,7 @@
 
 import('lib.pkp.plugins.importexport.native.filter.NativeXmlRepresentationFilter');
 
-class NativeXmlArticleGalleyFilter extends NativeXmlRepresentationFilter {
+class NativeXmlPreprintGalleyFilter extends NativeXmlRepresentationFilter {
 	/**
 	 * Constructor
 	 * @param $filterGroup FilterGroup
@@ -32,7 +32,7 @@ class NativeXmlArticleGalleyFilter extends NativeXmlRepresentationFilter {
 	 * @return string
 	 */
 	function getPluralElementName() {
-		return 'article_galleys'; // defined if needed in the future.
+		return 'preprint_galleys'; // defined if needed in the future.
 	}
 
 	/**
@@ -40,7 +40,7 @@ class NativeXmlArticleGalleyFilter extends NativeXmlRepresentationFilter {
 	 * @return string
 	 */
 	function getSingularElementName() {
-		return 'article_galley';
+		return 'preprint_galley';
 	}
 
 	//
@@ -50,7 +50,7 @@ class NativeXmlArticleGalleyFilter extends NativeXmlRepresentationFilter {
 	 * @copydoc PersistableFilter::getClassName()
 	 */
 	function getClassName() {
-		return 'plugins.importexport.native.filter.NativeXmlArticleGalleyFilter';
+		return 'plugins.importexport.native.filter.NativeXmlPreprintGalleyFilter';
 	}
 
 
@@ -105,7 +105,7 @@ class NativeXmlArticleGalleyFilter extends NativeXmlRepresentationFilter {
 	}
 
 	/**
-	 * Process the self_file_ref node found inside the article_galley node.
+	 * Process the self_file_ref node found inside the preprint_galley node.
 	 * @param $node DOMElement
 	 * @param $deployment NativeImportExportDeployment
 	 * @param $representation ArticleGalley
