@@ -131,7 +131,7 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 				}
 				$temporaryFilePath = $temporaryFile->getFilePath();
 
-				$filter = 'native-xml=>article';
+				$filter = 'native-xml=>preprint';
 				// is this articles import:
 				$xmlString = file_get_contents($temporaryFilePath);
 
@@ -193,7 +193,7 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 				);
 				import('lib.pkp.classes.file.FileManager');
 				$fileManager = new FileManager();
-				$exportFileName = $this->getExportFileName($this->getExportPath(), 'articles', $context, '.xml');
+				$exportFileName = $this->getExportFileName($this->getExportPath(), 'preprints', $context, '.xml');
 				$fileManager->writeFile($exportFileName, $exportXml);
 				$fileManager->downloadByPath($exportFileName);
 				$fileManager->deleteByPath($exportFileName);
@@ -321,7 +321,7 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 					return;
 				}
 
-				$filter = 'native-xml=>article';
+				$filter = 'native-xml=>preprint';
 				// is this articles import:
 				$xmlString = file_get_contents($xmlFile);
 				
@@ -389,8 +389,8 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 					return;
 				}
 				if ($xmlFile != '') switch (array_shift($args)) {
-					case 'article':
-					case 'articles':
+					case 'preprint':
+					case 'preprints':
 						file_put_contents($xmlFile, $this->exportSubmissions(
 							$args,
 							$context,
