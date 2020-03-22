@@ -42,9 +42,9 @@ msgid "plugins.importexport.native.cliUsage"
 msgstr ""
 "Usage: {$scriptName} {$pluginName} [command] ...\n"
 "Commands:\n"
-"\timport [xmlFileName] [journal_path] [user_name] ...\n"
-"\texport [xmlFileName] [journal_path] preprints [preprintId1] [preprintId2] ...\n"
-"\texport [xmlFileName] [journal_path] preprint [preprintId]\n"
+"\timport [xmlFileName] [server_path] [user_name] ...\n"
+"\texport [xmlFileName] [server_path] preprints [preprintId1] [preprintId2] ...\n"
+"\texport [xmlFileName] [server_path] preprint [preprintId]\n"
 "\n"
 ""
 
@@ -55,16 +55,16 @@ msgid "plugins.importexport.native.error.unknownUser"
 msgstr "The specified user, \"{$userName}\", does not exist."
 
 msgid "plugins.importexport.native.import.error.sectionTitleMismatch"
-msgstr "The section title \"{$section1Title}\" and the section title \"{$section2Title}\" in the \"{$issueTitle}\" issue matched the different existing journal sections."
+msgstr "The section title \"{$section1Title}\" and the section title \"{$section2Title}\" in the \"{$issueTitle}\" issue matched the different existing server sections."
 
 msgid "plugins.importexport.native.import.error.sectionTitleMatch"
-msgstr "The section title \"{$sectionTitle}\" in the \"{$issueTitle}\" issue matched an existing journal section, but another title of this section doesn't match with another title of the existing journal section."
+msgstr "The section title \"{$sectionTitle}\" in the \"{$issueTitle}\" issue matched an existing server section, but another title of this section doesn't match with another title of the existing server section."
 
 msgid "plugins.importexport.native.import.error.sectionAbbrevMismatch"
-msgstr "The section abbreviation \"{$section1Abbrev}\" and the section abbreviation \"{$section2Abbrev}\" of the \"{$issueTitle}\" issue matched the different existing journal sections."
+msgstr "The section abbreviation \"{$section1Abbrev}\" and the section abbreviation \"{$section2Abbrev}\" of the \"{$issueTitle}\" issue matched the different existing server sections."
 
 msgid "plugins.importexport.native.import.error.sectionAbbrevMatch"
-msgstr "The section abbreviation \"{$sectionAbbrev}\" in the \"{$issueTitle}\" issue matched an existing journal section, but another abbreviation of this section doesn't match with another abbreviation of the existing journal section."
+msgstr "The section abbreviation \"{$sectionAbbrev}\" in the \"{$issueTitle}\" issue matched an existing server section, but another abbreviation of this section doesn't match with another abbreviation of the existing server section."
 
 msgid "plugins.importexport.native.import.error.issueIdentificationMatch"
 msgstr "None or more than one issue matches the given issue identification \"{$issueIdentification}\"."

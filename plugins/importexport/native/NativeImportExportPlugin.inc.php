@@ -131,8 +131,8 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 				}
 				$temporaryFilePath = $temporaryFile->getFilePath();
 
-				$filter = 'native-xml=>preprint';
-				// is this preprints import:
+				$filter = 'native-xml=>article';
+				// is this articles import:
 				$xmlString = file_get_contents($temporaryFilePath);
 
 				$deployment = new NativeImportExportDeployment($context, $user);
@@ -193,7 +193,7 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 				);
 				import('lib.pkp.classes.file.FileManager');
 				$fileManager = new FileManager();
-				$exportFileName = $this->getExportFileName($this->getExportPath(), 'preprints', $context, '.xml');
+				$exportFileName = $this->getExportFileName($this->getExportPath(), 'articles', $context, '.xml');
 				$fileManager->writeFile($exportFileName, $exportXml);
 				$fileManager->downloadByPath($exportFileName);
 				$fileManager->deleteByPath($exportFileName);
@@ -278,19 +278,19 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 		$opts = $this->parseOpts($args, ['no-embed', 'use-file-urls']);
 		$command = array_shift($args);
 		$xmlFile = array_shift($args);
-		$journalPath = array_shift($args);
+		$contextPath = array_shift($args);
 
 		AppLocale::requireComponents(LOCALE_COMPONENT_APP_MANAGER, LOCALE_COMPONENT_PKP_MANAGER, LOCALE_COMPONENT_PKP_SUBMISSION);
 
-		$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
+		$contextDao = DAORegistry::getDAO('JournalDAO'); /* @var $contextDao JournalDAO */
 		$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
 
-		$journal = $journalDao->getByPath($journalPath);
+		$context = $contextDao->getByPath($contextPath);
 
-		if (!$journal) {
-			if ($journalPath != '') {
+		if (!$context) {
+			if ($contextPath != '') {
 				echo __('plugins.importexport.common.cliError') . "\n";
-				echo __('plugins.importexport.common.error.unknownJournal', array('journalPath' => $journalPath)) . "\n\n";
+				echo __('plugins.importexport.common.error.unknownJournal', array('journalPath' => $contextPath)) . "\n\n";
 			}
 			$this->usage($scriptName);
 			return;
@@ -321,11 +321,11 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 					return;
 				}
 
-				$filter = 'native-xml=>preprint';
-				// is this preprints import:
+				$filter = 'native-xml=>article';
+				// is this articles import:
 				$xmlString = file_get_contents($xmlFile);
 				
-				$deployment = new NativeImportExportDeployment($journal, $user);
+				$deployment = new NativeImportExportDeployment($context, $user);
 				$deployment->setImportPath(dirname($xmlFile));
 				$content = $this->importSubmissions($xmlString, $filter, $deployment);
 				$validationErrors = array_filter(libxml_get_errors(), function($a) {
@@ -389,11 +389,11 @@ class NativeImportExportPlugin extends ImportExportPlugin {
 					return;
 				}
 				if ($xmlFile != '') switch (array_shift($args)) {
-					case 'preprint':
-					case 'preprints':
+					case 'article':
+					case 'articles':
 						file_put_contents($xmlFile, $this->exportSubmissions(
 							$args,
-							$journal,
+							$context,
 							null,
 							$opts
 						));
