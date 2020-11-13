@@ -14,6 +14,9 @@
  */
 
 import('classes.subscription.form.SubscriptionForm');
+import('lib.pkp.classes.queue.queueJobs.EmailTemplateQueueJob');
+
+use Illuminate\Queue\Capsule\Manager as Queue;
 
 class InstitutionalSubscriptionForm extends SubscriptionForm {
 	/**
@@ -152,12 +155,8 @@ class InstitutionalSubscriptionForm extends SubscriptionForm {
 		// Send notification email
 		if ($this->_data['notifyEmail'] == 1) {
 			$mail = $this->_prepareNotificationEmail('SUBSCRIPTION_NOTIFY');
-			if (!$mail->send()) {
-				import('classes.notification.NotificationManager');
-				$notificationMgr = new NotificationManager();
-				$request = Application::get()->getRequest();
-				$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => __('email.compose.error')));
-			}
+			$request = Application::get()->getRequest();
+			Queue::pushOn('emailQueue', new EmailTemplateQueueJob($mail, $request));
 		} 
 	}
 }

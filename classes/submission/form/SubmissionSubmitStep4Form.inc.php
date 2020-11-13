@@ -14,6 +14,9 @@
  */
 
 import('lib.pkp.classes.submission.form.PKPSubmissionSubmitStep4Form');
+import('lib.pkp.classes.queue.queueJobs.EmailTemplateQueueJob');
+
+use Illuminate\Queue\Capsule\Manager as Queue;
 
 class SubmissionSubmitStep4Form extends PKPSubmissionSubmitStep4Form {
 	/**
@@ -85,19 +88,11 @@ class SubmissionSubmitStep4Form extends PKPSubmissionSubmitStep4Form {
 				'editorialContactSignature' => $context->getData('contactName'),
 			));
 
-			if (!$mail->send($request)) {
-				import('classes.notification.NotificationManager');
-				$notificationMgr = new NotificationManager();
-				$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => __('email.compose.error')));
-			}
+			Queue::pushOn('emailQueue', new EmailTemplateQueueJob($mail, $request));
 
 			$recipients = $authorMail->getRecipients();
 			if (!empty($recipients)) {
-				if (!$authorMail->send($request)) {
-					import('classes.notification.NotificationManager');
-					$notificationMgr = new NotificationManager();
-					$notificationMgr->createTrivialNotification($request->getUser()->getId(), NOTIFICATION_TYPE_ERROR, array('contents' => __('email.compose.error')));
-				}
+				Queue::pushOn('emailQueue', new EmailTemplateQueueJob($authorMail, $request));
 			}
 		}
 
