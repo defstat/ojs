@@ -12,7 +12,7 @@
  *
  * @brief Handle external gateway requests.
  */
-
+use Illuminate\Support\Facades\Artisan;
 import('classes.handler.Handler');
 
 class GatewayHandler extends Handler {
@@ -56,80 +56,87 @@ class GatewayHandler extends Handler {
 	 * @param $request PKPRequest
 	 */
 	function lockss($args, $request) {
-		$this->validate();
-		$this->setupTemplate($request);
+		try {
+			Artisan::call('queue:work', array('connection' => 'databaseQueueConnection', '--queue' => 'emailQueue'), null);
+		} catch (Exception $e) {
 
-		$journal = $request->getJournal();
-		$templateMgr = TemplateManager::getManager($request);
-
-		if ($journal != null) {
-			if (!$journal->getData('enableLockss')) {
-				$request->redirect(null, 'index');
-			}
-
-			$year = $request->getUserVar('year');
-
-			$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-
-			// FIXME Should probably go in IssueDAO or a subclass
-			if (isset($year)) {
-				$year = (int)$year;
-				$result = $issueDao->retrieve(
-					'SELECT * FROM issues WHERE journal_id = ? AND year = ? AND published = 1 ORDER BY current DESC, year ASC, volume ASC, number ASC',
-					array($journal->getId(), $year)
-				);
-				if ($result->RecordCount() == 0) {
-					unset($year);
-				}
-			}
-
-			if (!isset($year)) {
-				$result = $issueDao->retrieve(
-					'SELECT MAX(year) FROM issues WHERE journal_id = ? AND published = 1',
-					$journal->getId()
-				);
-				list($year) = $result->fields;
-				$templateMgr->assign('showInfo', true);
-			}
-
-			$prevYear = $nextYear = null;
-			if (isset($year)) {
-				$result = $issueDao->retrieve(
-					'SELECT MAX(year) FROM issues WHERE journal_id = ? AND published = 1 AND year < ?',
-					array($journal->getId(), $year)
-				);
-				list($prevYear) = $result->fields;
-
-				$result = $issueDao->retrieve(
-					'SELECT MIN(year) FROM issues WHERE journal_id = ? AND published = 1 AND year > ?',
-					array($journal->getId(), $year)
-				);
-				list($nextYear) = $result->fields;
-			}
-
-			$issues = $issueDao->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
-			$templateMgr->assign(array(
-				'journal' => $journal,
-				'year' => $year,
-				'prevYear' => $prevYear,
-				'nextYear' => $nextYear,
-				'issues' => $issues,
-			));
-
-			$locales = $journal->getSupportedLocaleNames();
-			if (!isset($locales) || empty($locales)) {
-				$localeNames = AppLocale::getAllLocales();
-				$primaryLocale = AppLocale::getPrimaryLocale();
-				$locales = array($primaryLocale => $localeNames[$primaryLocale]);
-			}
-			$templateMgr->assign('locales', $locales);
-		} else {
-			$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
-			$journals = $journalDao->getAll(true);
-			$templateMgr->assign('journals', $journals);
 		}
+		
 
-		$templateMgr->display('gateway/lockss.tpl');
+		// $this->validate();
+		// $this->setupTemplate($request);
+
+		// $journal = $request->getJournal();
+		// $templateMgr = TemplateManager::getManager($request);
+
+		// if ($journal != null) {
+		// 	if (!$journal->getData('enableLockss')) {
+		// 		$request->redirect(null, 'index');
+		// 	}
+
+		// 	$year = $request->getUserVar('year');
+
+		// 	$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+
+		// 	// FIXME Should probably go in IssueDAO or a subclass
+		// 	if (isset($year)) {
+		// 		$year = (int)$year;
+		// 		$result = $issueDao->retrieve(
+		// 			'SELECT * FROM issues WHERE journal_id = ? AND year = ? AND published = 1 ORDER BY current DESC, year ASC, volume ASC, number ASC',
+		// 			array($journal->getId(), $year)
+		// 		);
+		// 		if ($result->RecordCount() == 0) {
+		// 			unset($year);
+		// 		}
+		// 	}
+
+		// 	if (!isset($year)) {
+		// 		$result = $issueDao->retrieve(
+		// 			'SELECT MAX(year) FROM issues WHERE journal_id = ? AND published = 1',
+		// 			$journal->getId()
+		// 		);
+		// 		list($year) = $result->fields;
+		// 		$templateMgr->assign('showInfo', true);
+		// 	}
+
+		// 	$prevYear = $nextYear = null;
+		// 	if (isset($year)) {
+		// 		$result = $issueDao->retrieve(
+		// 			'SELECT MAX(year) FROM issues WHERE journal_id = ? AND published = 1 AND year < ?',
+		// 			array($journal->getId(), $year)
+		// 		);
+		// 		list($prevYear) = $result->fields;
+
+		// 		$result = $issueDao->retrieve(
+		// 			'SELECT MIN(year) FROM issues WHERE journal_id = ? AND published = 1 AND year > ?',
+		// 			array($journal->getId(), $year)
+		// 		);
+		// 		list($nextYear) = $result->fields;
+		// 	}
+
+		// 	$issues = $issueDao->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
+		// 	$templateMgr->assign(array(
+		// 		'journal' => $journal,
+		// 		'year' => $year,
+		// 		'prevYear' => $prevYear,
+		// 		'nextYear' => $nextYear,
+		// 		'issues' => $issues,
+		// 	));
+
+		// 	$locales = $journal->getSupportedLocaleNames();
+		// 	if (!isset($locales) || empty($locales)) {
+		// 		$localeNames = AppLocale::getAllLocales();
+		// 		$primaryLocale = AppLocale::getPrimaryLocale();
+		// 		$locales = array($primaryLocale => $localeNames[$primaryLocale]);
+		// 	}
+		// 	$templateMgr->assign('locales', $locales);
+		// } else {
+		// 	$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
+		// 	$journals = $journalDao->getAll(true);
+		// 	$templateMgr->assign('journals', $journals);
+		// }
+
+		// $templateMgr->display('gateway/lockss.tpl');
 	}
 
 	/**
