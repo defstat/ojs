@@ -57,7 +57,7 @@ class GatewayHandler extends Handler {
 	 */
 	function lockss($args, $request) {
 		try {
-			Artisan::call('queue:work', array('connection' => 'databaseQueueConnection', '--queue' => 'emailQueue'), null);
+			//Artisan::call('queue:work', array('connection' => 'databaseQueueConnection', '--queue' => 'emailQueue'), null);
 		} catch (Exception $e) {
 
 		}
