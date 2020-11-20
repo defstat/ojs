@@ -39,4 +39,8 @@
 		<descr>Send automated reminders about subscription expiry.</descr>
 		<frequency day="1"/>
 	</task>
+    <task class="lib.pkp.classes.task.LaravelSchedulerRun">
+		<descr>Send automated statistics reports to journal managers and editors.</descr>
+		<frequency hour="1"/>
+	</task>
 </scheduled_tasks>
