@@ -190,6 +190,29 @@
 							<div id="contributors-grid" ref="contributors">
 								<spinner></spinner>
 							</div>
+							<ul>
+								<li v-for="author in workingPublication.authors" :key="author.id">
+									{{ author.givenName['en_US'] }}
+									<pkp-button @click="editAuthor(author.id)">Edit</pkp-button>
+								</li>
+							</ul>
+
+							<modal
+								v-bind="MODAL_PROPS"
+								name="form"
+								@closed="formModalClosed"
+							>
+								<modal-content
+									closeLabel="__('common.close')"
+									modalName="form"
+									title="Update Contributor"
+								>
+									<pkp-form v-bind="components.{$smarty.const.FORM_CONTRIBUTOR}"
+										@set="updateForm"
+										@success="formSuccess"
+									/>
+								</modal-content>
+							</modal>
 						</tab>
 						{if $metadataEnabled}
 							<tab id="metadata" label="{translate key="submission.informationCenter.metadata"}">
