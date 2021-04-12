@@ -190,29 +190,57 @@
 							<div id="contributors-grid" ref="contributors">
 								<spinner></spinner>
 							</div>
-							<ul>
-								<li v-for="author in workingPublication.authors" :key="author.id">
-									{{ author.givenName['en_US'] }}
-									<pkp-button @click="editAuthor(author.id)">Edit</pkp-button>
-								</li>
-							</ul>
 
-							<modal
-								v-bind="MODAL_PROPS"
-								name="form"
-								@closed="formModalClosed"
-							>
+							{* <contributors-list-panel
+								v-bind="components.contributors"
+								@set="set"
+								:primary-author-id="workingPublication.primaryContactId"
+							/> *}
+
+							<list-panel :items="workingPublication.authors">
+								<pkp-header slot="header">
+									<h2>test</h2>
+									<spinner v-if="isLoading"></spinner>
+									<template slot="actions">
+										<pkp-button @click="openAddModal">
+											test
+										</pkp-button>
+									</template>
+								</pkp-header>
+								<template v-slot:itemTitle="{ldelim}item{rdelim}">
+									test
+								</template>
+								<template v-slot:itemSubtitle="{ldelim}item{rdelim}">
+									test
+								</template>
+								<template v-slot:itemActions="{ldelim}item{rdelim}">
+									<!-- if the primaryAuthorId if the item.id -->
+									<badge v-if="primaryAuthorId == item.id">
+										Primary Contact
+									</badge>
+
+									<pkp-button @click="openEditModal(item.id)">
+										test
+									</pkp-button>
+									<pkp-button :isWarnable="true" @click="openDeleteModal(item.id)">
+										test
+									</pkp-button>
+								</template>
+							</list-panel>
+							<modal v-bind="MODAL_PROPS" name="form" @closed="formModalClosed">
 								<modal-content
-									closeLabel="__('common.close')"
+									:closeLabel="__('common.close')"
 									modalName="form"
-									title="Update Contributor"
+									:title="activeFormTitle"
 								>
-									<pkp-form v-bind="components.{$smarty.const.FORM_CONTRIBUTOR}"
+									<pkp-form
+										v-bind="activeForm"
 										@set="updateForm"
 										@success="formSuccess"
 									/>
 								</modal-content>
 							</modal>
+
 						</tab>
 						{if $metadataEnabled}
 							<tab id="metadata" label="{translate key="submission.informationCenter.metadata"}">
