@@ -187,9 +187,19 @@
 							<pkp-form v-bind="components.{$smarty.const.FORM_TITLE_ABSTRACT}" @set="set" />
 						</tab>
 						<tab id="contributors" label="{translate key="publication.contributors"}">
-							<div id="contributors-grid" ref="contributors">
-								<spinner></spinner>
-							</div>
+							<contributors-list-panel
+								v-bind="components.contributors"
+								@set="set"
+								:primary-author-id="workingPublication.primaryContactId"
+								:items="workingPublication.authors"
+								:items-max="workingPublication.authors.length"
+								:publication-id="workingPublication.id"
+								@edited="contributorEdited"
+								@added="contributorAdded"
+								@deleted="contributorDeleted"
+								@order-up="contributorItemOrderUp"
+								@order-down="contributorItemOrderDown"
+							></contributors-list-panel>
 						</tab>
 						{if $metadataEnabled}
 							<tab id="metadata" label="{translate key="submission.informationCenter.metadata"}">
