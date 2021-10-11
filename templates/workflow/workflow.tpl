@@ -197,7 +197,9 @@
 								@edited="contributorChanged"
 								@added="contributorChanged"
 								@deleted="contributorChanged"
+								@deleted="contributorChanged"
 								@primary-contact-changed="primaryContactChanged"
+								@contributors-order-changed="contributorsOrderChanged"
 								@order-up="contributorItemOrderUp"
 								@order-down="contributorItemOrderDown"
 							></contributors-list-panel>
