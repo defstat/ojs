@@ -189,6 +189,7 @@
 						<tab id="contributors" label="{translate key="publication.contributors"}">
 							<contributors-list-panel
 								v-bind="components.contributors"
+								class="pkpWorkflow__contributors"
 								@set="set"
 								:primary-author-id="workingPublication.primaryContactId"
 								:items="workingPublication.authors"
