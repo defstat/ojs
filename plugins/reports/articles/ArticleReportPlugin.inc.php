@@ -85,11 +85,7 @@ class ArticleReportPlugin extends ReportPlugin
         $submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO'); /** @var SubmissionDisciplineDAO $submissionDisciplineDao */
         $submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO'); /** @var SubmissionAgencyDAO $submissionAgencyDao */
 
-        $editorUserGroupIds = array_map(function ($userGroup) {
-            return $userGroup->getId();
-        }, array_filter($userGroupDao->getByContextId($context->getId())->toArray(), function ($userGroup) {
-            return in_array($userGroup->getRoleId(), [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR]);
-        }));
+        $editorUserGroupIds = Repo::userGroup()->getByRoleIds([Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR], $context->getId());
 
         // Load the data from the database and store it in an array.
         // (This must be stored before display because we won't know the data
@@ -121,7 +117,7 @@ class ArticleReportPlugin extends ReportPlugin
             $editors = $editorsById = [];
             while ($stageAssignment = $stageAssignmentsFactory->next()) {
                 $userId = $stageAssignment->getUserId();
-                if (!in_array($stageAssignment->getUserGroupId(), $editorUserGroupIds)) {
+                if ($editorUserGroupIds->contains('userGroupId', $stageAssignment->getUserGroupId())) {
                     continue;
                 }
                 if (isset($editors[$userId])) {

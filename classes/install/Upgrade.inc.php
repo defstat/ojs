@@ -98,7 +98,7 @@ class Upgrade extends Installer
             'SELECT a.author_id, s.context_id FROM authors a JOIN submissions s ON (a.submission_id = s.submission_id) JOIN user_groups g ON (a.user_group_id = g.user_group_id) WHERE g.context_id <> s.context_id'
         );
         foreach ($result as $row) {
-            $authorGroup = $userGroupDao->getDefaultByRoleId($row->context_id, Role::ROLE_ID_AUTHOR);
+            $authorGroup = Repo::userGroup()->getByRoleIds([Role::ROLE_ID_AUTHOR], $row->context_id, true);
             if ($authorGroup) {
                 $userGroupDao->update('UPDATE authors SET user_group_id = ? WHERE author_id = ?', [(int) $authorGroup->getId(), $row->author_id]);
             }

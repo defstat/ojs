@@ -262,9 +262,7 @@ class IssueHandler extends APIHandler
 
     protected function getUserGroups(int $contextId): array
     {
-        /** @var UserGroupDAO $userGroupDao */
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-        return $userGroupDao->getByContextId($contextId)->toArray();
+        return Repo::userGroup()->getByContextId($contextId)->toArray();
     }
 
     protected function getGenres(int $contextId): array
