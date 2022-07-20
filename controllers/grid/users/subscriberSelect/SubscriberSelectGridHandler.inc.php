@@ -62,13 +62,12 @@ class SubscriberSelectGridHandler extends GridHandler
         parent::initialize($request, $args);
 
         $stageId = $this->getAuthorizedContextObject(ASSOC_TYPE_WORKFLOW_STAGE);
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /** @var UserGroupDAO $userGroupDao */
-        $userGroups = $userGroupDao->getUserGroupsByStage(
+        $userGroups = Repo::userGroup()->getUserGroupsByStage(
             $request->getContext()->getId(),
             $stageId
         );
         $this->_userGroupOptions = [];
-        while ($userGroup = $userGroups->next()) {
+        foreach ($userGroups as $userGroup) {
             $this->_userGroupOptions[$userGroup->getId()] = $userGroup->getLocalizedName();
         }
 
