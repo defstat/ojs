@@ -14,6 +14,7 @@
 
 namespace APP\migration\upgrade\v3_4_0;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use PKP\install\DowngradeNotSupportedException;
 
@@ -30,16 +31,20 @@ class MergeLocalesMigration extends \PKP\migration\upgrade\v3_4_0\MergeLocalesMi
     {
         parent::up();
 
-        // Those should not be here - I added them here just for demonstration purposes
-        // journals
-
-
         // issue_galleys
         $issueGalleys = DB::table('issue_galleys')
             ->get();
 
         foreach ($issueGalleys as $issueGalley) {
             $this->updateSingleValueLocale($issueGalley->locale, 'issue_galleys', 'locale', 'galley_id', $issueGalley->galley_id);
+        }
+
+        // publication_galleys
+        $publicationGalleys = DB::table('publication_galleys')
+            ->get();
+
+        foreach ($publicationGalleys as $publicationGalley) {
+            $this->updateSingleValueLocale($publicationGalley->locale, 'publication_galleys', 'locale', 'galley_id', $publicationGalley->galley_id);
         }
     }
 
@@ -51,84 +56,16 @@ class MergeLocalesMigration extends \PKP\migration\upgrade\v3_4_0\MergeLocalesMi
         throw new DowngradeNotSupportedException();
     }
 
-    public function updateArrayLocaleNoId(string $dbLocales, string $table, string $column)
+    protected function getSettingsTables(): Collection
     {
-        $siteSupportedLocales = json_decode($dbLocales);
-
-        if ($siteSupportedLocales !== false) {
-            $newLocales = [];
-            foreach ($siteSupportedLocales as $siteSupportedLocale) {
-                $newLocales[] = substr($siteSupportedLocale, 0, 2);
-            }
-
-            DB::table($table)
-                ->update([
-                    $column => $newLocales
-                ]);
-        }
-    }
-
-    public function updateArrayLocale(string $dbLocales, string $table, string $column, string $tableKeyColumn, int $id)
-    {
-        $siteSupportedLocales = json_decode($dbLocales);
-
-        if ($siteSupportedLocales !== false) {
-            $newLocales = [];
-            foreach ($siteSupportedLocales as $siteSupportedLocale) {
-                $newLocales[] = substr($siteSupportedLocale, 0, 2);
-            }
-
-            DB::table($table)
-                ->where($tableKeyColumn, '=', $id)
-                ->update([
-                    $column => $newLocales
-                ]);
-        }
-    }
-
-    public function updateArrayLocaleSetting(string $dbLocales, string $table, string $settingValue, string $tableKeyColumn, int $id)
-    {
-        $siteSupportedLocales = json_decode($dbLocales);
-
-        if ($siteSupportedLocales !== false) {
-            $newLocales = [];
-            foreach ($siteSupportedLocales as $siteSupportedLocale) {
-                $newLocales[] = substr($siteSupportedLocale, 0, 2);
-            }
-
-            DB::table($table)
-                ->where($tableKeyColumn, '=', $id)
-                ->where('setting_name', '=', $settingValue)
-                ->update([
-                    'setting_value' => $newLocales
-                ]);
-        }
-    }
-
-    public function updateSingleValueLocale(string $localevalue, string $table, string $column, string $tableKeyColumn, int $id)
-    {
-        DB::table($table)
-            ->where($tableKeyColumn, '=', $id)
-            ->update([
-                $column => substr($localevalue, 0, 2)
-            ]);
-    }
-
-    public function updateSingleValueLocaleNoId(string $localevalue, string $table, string $column)
-    {
-        DB::table($table)
-            ->update([
-                $column => substr($localevalue, 0, 2)
-            ]);
-    }
-
-    public function updateSingleValueLocaleEmailData(string $localevalue, string $table, string $column, string $tableKeyColumn, string $id)
-    {
-        DB::table($table)
-            ->where($tableKeyColumn, '=', $id)
-            ->where($column, '=', $localevalue)
-            ->update([
-                $column => substr($localevalue, 0, 2)
-            ]);
+        return collect([
+            'issue_galley_settings',
+            'issue_settings',
+            'journal_settings',
+            'publication_galley_settings',
+            'section_settings',
+            'static_page_settings',
+            'subscription_type_settings'
+        ])->merge(parent::getSettingsTables());
     }
 }
