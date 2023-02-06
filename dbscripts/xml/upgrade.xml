@@ -76,7 +76,7 @@
 	<upgrade minversion="3.1.0.0" maxversion="3.1.0.9">
 		<data file="dbscripts/xml/upgrade/3.1.1_update.xml" />
 		<code function="updateSuppFileMetrics" />
-		<code function="installEmailTemplate" key="REVISED_VERSION_NOTIFY" locales="ar_IQ,da_DK,en_US,es_ES,fa_IR,fi_FI,fr_CA,fr_FR,id_ID,pt_PT,ru_RU,sv_SE" />
+		<code function="installEmailTemplate" key="REVISED_VERSION_NOTIFY" locales="ar_IQ,da_DK,en,es,fa_IR,fi_FI,fr,id_ID,pt_PT,ru_RU,sv_SE" />
 		<code function="clearDataCache" />
 	</upgrade>
 
@@ -108,7 +108,7 @@
 		<code function="migrateSiteStylesheet" />
 		<code function="migrateMetadataSettings" />
 		<code function="createLicenseTerms" />
-		<code function="installEmailTemplate" key="REVIEW_REINSTATE" locales="en_US" />
+		<code function="installEmailTemplate" key="REVIEW_REINSTATE" locales="en" />
 		<code function="changeUserRolesAndStageAssignmentsForStagePermitSubmissionEdit" />
 		<data file="dbscripts/xml/upgrade/3.2.0_versioning.xml" />
 		<data file="dbscripts/xml/upgrade/3.2.0_versioning_submissionCategories.xml" condition="return $installer->tableExists('submission_categories');" />
@@ -116,13 +116,13 @@
 		<data file="dbscripts/xml/upgrade/3.2.0_url_path.xml" />
 		<code function="setStatsEmailSettings" />
 		<code function="fixLibraryFiles" />
-		<code function="installEmailTemplate" key="STATISTICS_REPORT_NOTIFICATION" locales="ar_IQ,ca_ES,cs_CZ,da_DK,de_DE,en_US,es_ES,fi_FI,fr_CA,hi_IN,hu_HU,id_ID,it_IT,ku_IQ,pt_BR,pt_PT,ru_RU,sl_SI,sv_SE,tr_TR,vi_VN,zh_CN" />
+		<code function="installEmailTemplate" key="STATISTICS_REPORT_NOTIFICATION" locales="ar_IQ,ca_ES,cs_CZ,da_DK,de_DE,en,es,fi_FI,fr,hi_IN,hu_HU,id_ID,it_IT,ku_IQ,pt_BR,pt_PT,ru_RU,sl_SI,sv_SE,tr_TR,vi_VN,zh_CN" />
 		<note file="docs/release-notes/README-3.2.0" />
 	</upgrade>
 
 	<upgrade minversion="3.1.0.0" maxversion="3.2.0.9">
 		<data file="dbscripts/xml/upgrade/3.2.1_update.xml" />
-		<code function="installEmailTemplate" key="ANNOUNCEMENT" locales="ca_ES,cs_CZ,ar_IQ,da_DK,en_US,es_ES,fr_CA,id_ID,it_IT,pt_BR,pt_PT,ru_RU,sl_SI,sv_SE,tr_TR,vi_VN,zh_CN" />
+		<code function="installEmailTemplate" key="ANNOUNCEMENT" locales="ca_ES,cs_CZ,ar_IQ,da_DK,en,es,fr,id_ID,it_IT,pt_BR,pt_PT,ru_RU,sl_SI,sv_SE,tr_TR,vi_VN,zh_CN" />
 		<migration class="PKP\migration\upgrade\PKPv3_2_1SubeditorCategoriesMigration" />
 		<note file="docs/release-notes/README-3.2.1" />
 	</upgrade>
@@ -191,6 +191,7 @@
 		<migration class="APP\migration\upgrade\v3_4_0\I6306_EnableCategories"/>
 		<migration class="PKP\migration\upgrade\v3_4_0\I8592_SiteNotificationSubscriptions"/>
 		<migration class="APP\migration\upgrade\v3_4_0\I6241_RequiredGenres"/>
+		<migration class="APP\migration\upgrade\v3_4_0\MergeLocalesMigration"/>
 		<data file="dbscripts/xml/upgrade/3.4.0_preupdate_email_templates.xml" />
 		<note file="docs/release-notes/README-3.4.0" />
 	</upgrade>
